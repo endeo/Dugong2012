@@ -15,10 +15,11 @@ public class GoblinAI : MonoBehaviour {
 	//1 - Alarmed
 	//2 - Chasing Player
 	//3 - Searching for the Player
-	//4 - Attacking Mode
+	
+
 	
 	//Arrow Variables:
-	int arrowsLeft;
+	public int arrowsLeft;
 	int arrowDelay;
 	
 	float goblinHealth = 100;
@@ -34,6 +35,10 @@ public class GoblinAI : MonoBehaviour {
 	//The current player targetted by the Goblin:
 	static GameObject targetPlayer;
 	
+	//Variable for wandering:
+	Vector3 wayPoint;
+	int moveDelay;
+	
 	//Variables for A.I. Navigation:
 	float playerRange;
 	float closeToLastLocation;
@@ -42,11 +47,19 @@ public class GoblinAI : MonoBehaviour {
 	// Initialisation of variables and objects:
 	void Start () 
 	{
+		Wander();
 		moveSpeed = 0.85f;
 		currentState = 0;
 		targetPlayer = GameObject.Find("You");
 		controller = GetComponent<CharacterController>();
-		arrowsLeft = 10;
+	}
+	
+	void Wander()
+	{
+	wayPoint = Random.insideUnitSphere*4;
+	wayPoint.x = wayPoint.x + transform.position.x;
+	wayPoint.z = wayPoint.z + transform.position.z;
+    wayPoint.y = 0;
 	}
 	
 	// Update is called once per frame:
@@ -69,8 +82,28 @@ public class GoblinAI : MonoBehaviour {
 		{
 			if((currentState != 3)) //...nor am I looking for him...
 			{
+				
 				//So I'll stay where I am and chill out until...
-				if(playerRange < 9.0f) //I CAN HEAR THE PLAYER!
+				
+				closeToLastLocation = Vector3.Distance(transform.position,wayPoint);
+				
+				moveDelay++;
+				if (moveDelay >= 100)
+				{
+					Wander();
+					moveDelay = 0;
+				}
+				
+				Quaternion targetRotation = Quaternion.LookRotation(wayPoint - transform.position);
+		        targetRotation = new Quaternion(0,targetRotation.y,0,targetRotation.w);
+		      	transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 0.1f);
+   		     	
+  		   	     var delta = wayPoint - transform.position;
+      			 delta.Normalize();
+				 controller.SimpleMove(delta * moveSpeed);
+  		   		
+				
+				if(playerRange < 8.5f) //I CAN HEAR THE PLAYER!
 				{
 				//I'M ALARMED BY HIS NOISES!
 				currentState = 1;
@@ -92,17 +125,20 @@ public class GoblinAI : MonoBehaviour {
 		
 		if(currentState == 1)
 		{
+			
 			//IF THE PLAYER IS SEEN BY THE GOBLIN (Using a Linecast...)
 			//This could be improved by adding an angle of view, but I've not added that in yet:
 			RaycastHit playerSensor;
 			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
 			{
+				Debug.Log (playerSensor.collider.gameObject.name);
 				if (playerSensor.collider.gameObject.name == "YouObject")
 				{
 					//Start Chasing
 					currentState = 2;
 				}
 			}
+			
 		}
 		
 		/////////////////////////////////////
@@ -113,6 +149,7 @@ public class GoblinAI : MonoBehaviour {
 		
 		if(currentState == 2)
 		{
+	
 			
 			if(Vector3.Distance(transform.position,lastKnownLocation) < 1.0f)
 			{
@@ -134,6 +171,7 @@ public class GoblinAI : MonoBehaviour {
 			RaycastHit playerSensor;
 			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
 			{
+				
 				if (playerSensor.collider.gameObject.name == "YouObject")
 				{
 					//The goblin remembers where the player was, so he can follow the
@@ -149,7 +187,7 @@ public class GoblinAI : MonoBehaviour {
 			
 			
 			//If I have no arrows left or the player is very close...
-			if((arrowsLeft <= 0) | (Vector3.Distance(transform.position,lastKnownLocation) < 4.0f))
+			if((arrowsLeft <= 0) | (Vector3.Distance(transform.position,lastKnownLocation) < 4.0f) | (Vector3.Distance(transform.position,lastKnownLocation) > 8.0f))
 			{
 			//Charge the player
 			var delta = lastKnownLocation - transform.position;
@@ -160,11 +198,14 @@ public class GoblinAI : MonoBehaviour {
 			{
 			//Shoot the player
 				arrowDelay++;
-				if(arrowDelay >= 100)
+				
+				if(arrowDelay >= 200)
 				{
 				GameObject newArrow = Instantiate(Resources.Load("Props/Arrow1"), new Vector3 (transform.position.x,transform.position.y + 1f,transform.position.z), transform.rotation) as GameObject;
 				var delta = lastKnownLocation - transform.position;
+				delta.y = delta.y + 0.2f;
       			delta.Normalize();
+				newArrow.transform.LookAt(new Vector3(lastKnownLocation.x,lastKnownLocation.y + 27f,lastKnownLocation.z));
 				newArrow.transform.rigidbody.AddForce (delta * 600f);
 				arrowsLeft --;
 				arrowDelay = 0;
