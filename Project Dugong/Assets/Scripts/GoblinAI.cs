@@ -82,6 +82,7 @@ public class GoblinAI : MonoBehaviour {
 		{
 			if((currentState != 3)) //...nor am I looking for him...
 			{
+				
 				//So I'll stay where I am and chill out until...
 				
 				closeToLastLocation = Vector3.Distance(transform.position,wayPoint);
@@ -124,17 +125,20 @@ public class GoblinAI : MonoBehaviour {
 		
 		if(currentState == 1)
 		{
+			
 			//IF THE PLAYER IS SEEN BY THE GOBLIN (Using a Linecast...)
 			//This could be improved by adding an angle of view, but I've not added that in yet:
 			RaycastHit playerSensor;
 			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
 			{
+				Debug.Log (playerSensor.collider.gameObject.name);
 				if (playerSensor.collider.gameObject.name == "YouObject")
 				{
 					//Start Chasing
 					currentState = 2;
 				}
 			}
+			
 		}
 		
 		/////////////////////////////////////
@@ -167,6 +171,7 @@ public class GoblinAI : MonoBehaviour {
 			RaycastHit playerSensor;
 			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
 			{
+				
 				if (playerSensor.collider.gameObject.name == "YouObject")
 				{
 					//The goblin remembers where the player was, so he can follow the
@@ -193,6 +198,7 @@ public class GoblinAI : MonoBehaviour {
 			{
 			//Shoot the player
 				arrowDelay++;
+				
 				if(arrowDelay >= 200)
 				{
 				GameObject newArrow = Instantiate(Resources.Load("Props/Arrow1"), new Vector3 (transform.position.x,transform.position.y + 1f,transform.position.z), transform.rotation) as GameObject;
