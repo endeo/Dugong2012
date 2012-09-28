@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// Goblin A.I.
-/// Logic for the Enemy Type "Goblin"
+/// Slime A.I.
+/// Logic for the Enemy Type "Slime"
 /// Coded by Sean Aug 2012
 /// </summary>
 
@@ -44,7 +44,7 @@ public class SlimeAI : MonoBehaviour {
 	void Start () 
 	{
 		Wander();
-		moveSpeed = 5f;
+		moveSpeed = 20f;
 		currentState = 0;
 		targetPlayer = GameObject.Find("You");
 		controller = GetComponent<Rigidbody>();
@@ -226,12 +226,10 @@ public class SlimeAI : MonoBehaviour {
 		
 		bouncedelay ++;
 		
-		if (bouncedelay >= 70)
+		if (bouncedelay >= 50)
 		{
-		Debug.Log("Bounce");
 		bouncedelay = 0;
 		controller.AddForce(new Vector3(0,30,0));
-	
 		}
 		
 		
