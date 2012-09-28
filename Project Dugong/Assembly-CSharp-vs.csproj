@@ -61,6 +61,7 @@
      <Compile Include="Assets\Scripts\PlayerFacer.cs" />
      <Compile Include="Assets\Scripts\PressurePlateScript.cs" />
      <Compile Include="Assets\Scripts\SignScript.cs" />
+     <Compile Include="Assets\Scripts\SlimeAI.cs" />
      <None Include="Assets\StrumpyShaderEditor\Editor\Resources\Internal\Temp\TempShader.shader" />
      <None Include="Assets\StrumpyShaderEditor\Editor\Resources\Internal\TextureCopy.shader" />
   </ItemGroup>

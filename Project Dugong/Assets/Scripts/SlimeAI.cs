@@ -4,10 +4,10 @@ using System.Collections;
 /// <summary>
 /// Goblin A.I.
 /// Logic for the Enemy Type "Goblin"
-/// Coded by Martin and Sean Aug 2012
+/// Coded by Sean Aug 2012
 /// </summary>
 
-public class GoblinAI : MonoBehaviour {
+public class SlimeAI : MonoBehaviour {
 	
 	//GOBLIN STATE STORAGE:
 	int currentState;
@@ -16,18 +16,14 @@ public class GoblinAI : MonoBehaviour {
 	//2 - Chasing Player
 	//3 - Searching for the Player
 	
-
-	
-	//Arrow Variables:
-	public int arrowsLeft;
-	int arrowDelay;
+	int bouncedelay = 0;
 	
 	float goblinHealth = 100;
 	
 	public GameObject goblinRagdoll;
 	
 	//Character Controller:
-	CharacterController controller = new CharacterController();
+	Rigidbody controller = new Rigidbody();
 	
 	//Movement related Variables
 	static float moveSpeed;
@@ -48,10 +44,10 @@ public class GoblinAI : MonoBehaviour {
 	void Start () 
 	{
 		Wander();
-		moveSpeed = 0.85f;
+		moveSpeed = 5f;
 		currentState = 0;
 		targetPlayer = GameObject.Find("You");
-		controller = GetComponent<CharacterController>();
+		controller = GetComponent<Rigidbody>();
 	}
 	
 	void Wander()
@@ -100,7 +96,7 @@ public class GoblinAI : MonoBehaviour {
    		     	
   		   	     var delta = wayPoint - transform.position;
       			 delta.Normalize();
-				 controller.SimpleMove(delta * moveSpeed);
+				 controller.AddForce(delta * moveSpeed);
   		   		
 				
 				if(playerRange < 8.5f) //I CAN HEAR THE PLAYER!
@@ -129,7 +125,7 @@ public class GoblinAI : MonoBehaviour {
 			//IF THE PLAYER IS SEEN BY THE GOBLIN (Using a Linecast...)
 			//This could be improved by adding an angle of view, but I've not added that in yet:
 			RaycastHit playerSensor;
-			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
+			if(Physics.Linecast (transform.position,targetPlayer.transform.position,out playerSensor))
 			{
 				if (playerSensor.collider.gameObject.name == "YouObject")
 				{
@@ -163,12 +159,11 @@ public class GoblinAI : MonoBehaviour {
 			Quaternion targetRotation = Quaternion.LookRotation(targetPlayer.transform.position - transform.position);
 			targetRotation = new Quaternion(0,targetRotation.y,0,targetRotation.w);
 			transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 0.1f);
-			transform.FindChild("Head").transform.rotation = Quaternion.Slerp(transform.FindChild("Head").transform.rotation, targetRotation, 0.12f);
 			
 			//CHECK THE PLAYER CAN STILL SEE THE GOBLIN (Using a Linecast...)
 			//This could be improved by adding an angle of view, but I've not added that in yet
 			RaycastHit playerSensor;
-			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
+			if(Physics.Linecast (transform.position,targetPlayer.transform.position,out playerSensor))
 			{
 				
 				if (playerSensor.collider.gameObject.name == "YouObject")
@@ -184,32 +179,12 @@ public class GoblinAI : MonoBehaviour {
 				}
 			}
 			
-			
-			//If I have no arrows left or the player is very close...
-			if((arrowsLeft <= 0) | (Vector3.Distance(transform.position,lastKnownLocation) < 4.0f) | (Vector3.Distance(transform.position,lastKnownLocation) > 8.0f))
-			{
+
 			//Charge the player
 			var delta = lastKnownLocation - transform.position;
       		delta.Normalize();
-			controller.SimpleMove(delta * moveSpeed);
-			}
-			else
-			{
-			//Shoot the player
-				arrowDelay++;
-				
-				if(arrowDelay >= 200)
-				{
-				GameObject newArrow = Instantiate(Resources.Load("Props/Arrow1"), new Vector3 (transform.position.x,transform.position.y + 1f,transform.position.z), transform.rotation) as GameObject;
-				var delta = lastKnownLocation - transform.position;
-				delta.y = delta.y + 0.2f;
-      			delta.Normalize();
-				newArrow.transform.LookAt(new Vector3(lastKnownLocation.x,lastKnownLocation.y + 27f,lastKnownLocation.z));
-				newArrow.transform.rigidbody.AddForce (delta * 600f);
-				arrowsLeft --;
-				arrowDelay = 0;
-				}
-			}
+			controller.AddForce(delta * moveSpeed);
+
 		}
 		
 		/////////////////////////////////////
@@ -224,11 +199,11 @@ public class GoblinAI : MonoBehaviour {
 			//Move to the last location the Goblin saw the player:
 			var delta = lastKnownLocation - transform.position;
       		delta.Normalize();
-			controller.SimpleMove(delta * moveSpeed);
+			controller.AddForce(delta * moveSpeed);
 			
 			//Keep an eye out for the player's whereabouts:
 			RaycastHit playerSensor;
-			if(Physics.Linecast (transform.FindChild("Head").transform.position,targetPlayer.transform.position,out playerSensor))
+			if(Physics.Linecast (transform.position,targetPlayer.transform.position,out playerSensor))
 			{
 				if (playerSensor.collider.gameObject.name == "YouObject")
 				{
@@ -247,6 +222,16 @@ public class GoblinAI : MonoBehaviour {
 			//Lost him... better go back to chilling out!
 			currentState = 0;	
 			}	
+		}
+		
+		bouncedelay ++;
+		
+		if (bouncedelay >= 70)
+		{
+		Debug.Log("Bounce");
+		bouncedelay = 0;
+		controller.AddForce(new Vector3(0,30,0));
+	
 		}
 		
 		
