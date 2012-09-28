@@ -189,106 +189,7 @@ public class PlayerController : MonoBehaviour
 	//Called every frame that has actually loaded
 	void Update() 
 	{
-		// 3D Movement
-		//Only move if the player is in "3D active" mode
-		if (PlayerState == 0)
-		{
-			if (Input.GetKey(KeyCode.W))
-			{
-        		movedir = movedir + cam.TransformDirection(Vector3.forward);
-				ismoving = true;
-			}
-			if (Input.GetKey(KeyCode.A))
-			{
-        		movedir = movedir + cam.TransformDirection(Vector3.left);
-				ismoving = true;
-			}
-			if (Input.GetKey(KeyCode.S))
-			{
-        		movedir = movedir + cam.TransformDirection(Vector3.back);
-				ismoving = true;
-			}
-			if (Input.GetKey(KeyCode.D))
-			{
-	        	movedir = movedir + cam.TransformDirection(Vector3.right);
-				ismoving = true;
-			}
-			if(ismoving && controller.isGrounded)
-			{
-				controller.SimpleMove(movedir * movespeed);
-			}
-			else if(controller.isGrounded == false)
-			{
-				movedir.y -= (gravity * Time.deltaTime);
-				controller.SimpleMove(movedir * Time.deltaTime);
-			}
-			ismoving = false;
-			movedir = new Vector3(0,0,0);
-		}
-		
-		// 2D Movement
-		//Only move if the player is in "2D Active" mode
-		if (PlayerState == 3)
-		{
-			
-			if (Input.GetKey(KeyCode.A))
-			{
-        		movedir = cam.TransformDirection(Vector3.left);
-				ismoving = true;
-				LastDirection = 0;
-			}
-			if (Input.GetKey(KeyCode.D))
-			{
-	        	movedir = cam.TransformDirection(Vector3.right);
-				ismoving = true;
-				LastDirection = 1;
-			}
-			//Only move if the player is touching the ground and a movement button has been pressed
-			if(ismoving && controller.isGrounded)
-			{
-				if(!audio.isPlaying)
-				{
-					audio.Play();
-				}
-				controller.SimpleMove(movedir * movespeed);
-				theGameCharacter.animation.CrossFade("WalkingFront", 0.3f);
-			}
-			//Otherwise, he will start falling
-			else if(controller.isGrounded == false)
-			{
-				movedir.y -= (gravity * Time.deltaTime);
-				controller.SimpleMove(movedir * Time.deltaTime);
-			}
-			else
-			{
-				audio.Stop();
-				theGameCharacter.animation.CrossFade("idle", 0.2f);
-			}
-			//Move arms
-			if(ismoving && controller.isGrounded)
-			{
-				if(attackCycle == 0 && !isCarrying)
-				{
-					theGameCharacter.FindChild("YouAscendedArms").animation.CrossFade("WalkingFront", 0.8f);
-				}
-			}
-			else if(controller.isGrounded == false)
-			{
-			}
-			else
-			{
-				if(attackCycle == 0)
-				{
-					theGameCharacter.FindChild("YouAscendedArms").animation.CrossFade("idle", 0.2f);
-				}
-			}
-			//Reset Movement
-			ismoving = false;
-			movedir = new Vector3(0,0,0);
-		}
-		
-		//3RD Movement
-		//Only move if the player is in "EXPIRIMENTAL" mode
+		//Movement
 		if (PlayerState == 5)
 		{
 			
@@ -298,6 +199,7 @@ public class PlayerController : MonoBehaviour
 				ismoving = true;
 				movedir += transform.TransformDirection(Vector3.forward);
         		moveCount++;
+				theGameCharacter.animation.CrossFade("WalkingFront", 0.3f);
 			}
 			if (Input.GetKey(KeyCode.A))
 			{
@@ -321,6 +223,16 @@ public class PlayerController : MonoBehaviour
 			if(ismoving)
 			{
 				controller.SimpleMove(movedir * (movespeed * (1.0f - (moveCount * 0.2f))));
+				if(!audio.isPlaying)
+				{
+					audio.Play();
+				}
+			}
+			
+			if(!ismoving && controller.isGrounded == true)
+			{
+				audio.Stop();
+				theGameCharacter.animation.CrossFade("idle", 0.2f);
 			}
 			
 			if(controller.isGrounded == false && ismoving == false)
@@ -328,6 +240,23 @@ public class PlayerController : MonoBehaviour
 				controller.SimpleMove(Vector3.down * (Time.deltaTime + gravity));
 			}
 			
+			if(ismoving && controller.isGrounded)
+			{
+				if(attackCycle == 0 && !isCarrying)
+				{
+					theGameCharacter.FindChild("YouAscendedArms").animation.CrossFade("WalkingFront", 0.8f);
+				}
+			}
+			else if(controller.isGrounded == false)
+			{
+			}
+			else
+			{
+				if(attackCycle == 0)
+				{
+					theGameCharacter.FindChild("YouAscendedArms").animation.CrossFade("idle", 0.2f);
+				}
+			}
 			
 			
 			float h = 2.0f * Input.GetAxis("Mouse X");
@@ -348,7 +277,7 @@ public class PlayerController : MonoBehaviour
 			cam.transform.rotation = Quaternion.Slerp(cam.transform.rotation, CameraRotationY, 0.05f);
 		}
 		
-		//Pause menu at some point
+		//Pause Menu
 		if (Input.GetKeyDown(KeyCode.E))
 		{
 			if(inventoryPrefab.camera.enabled)
@@ -387,7 +316,7 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 		//2D or 3D Active
-		if(PlayerState == 0 || PlayerState == 3)
+		if(PlayerState == 5 || PlayerState == 3)
 		{
 			if(Application.loadedLevelName == "TestingArena")
 			{

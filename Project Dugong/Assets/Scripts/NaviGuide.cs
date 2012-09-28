@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NaviBall : MonoBehaviour {
+public class NaviGuide : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -12,4 +12,13 @@ public class NaviBall : MonoBehaviour {
 	void Update () {
 	
 	}
+	
+	void OnTriggerEnter(Collider other) 
+	{
+		if(other.tag == "IOEnemy")
+		{
+			Destroy(other.gameObject);
+		}
+    }
+	
 }

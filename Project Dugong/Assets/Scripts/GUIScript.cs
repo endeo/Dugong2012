@@ -97,7 +97,7 @@ public class GUIScript : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		if(transform.GetComponent<PlayerController>().GetPlayerState() == 0 || transform.GetComponent<PlayerController>().GetPlayerState() == 3)
+		if(transform.GetComponent<PlayerController>().GetPlayerState() == 5 || transform.GetComponent<PlayerController>().GetPlayerState() == 3)
 		{
 			GUI.Label(new Rect(50,(Screen.height - 150),1050, 3570), guiBars);
 			GUI.Label(new Rect((Screen.width - 250),(Screen.height - 75),1050, 3570), wongaPouch);
@@ -126,7 +126,10 @@ public class GUIScript : MonoBehaviour {
 			}
 		}
 		
-		GUI.Label(new Rect(Input.mousePosition.x, (Screen.height - Input.mousePosition.y), 210, 200), NewCursor);
+		if(transform.GetComponent<PlayerController>().GetPlayerState() != 5)
+		{
+			GUI.Label(new Rect(Input.mousePosition.x, (Screen.height - Input.mousePosition.y), 210, 200), NewCursor);
+		}
 		
 		
 		
