@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
 	void Start () 
 	{
 		//Initialize Stats
-		PlayerState = 0;
+		ChangePlayerState(5);
 		attackCycle = 0;
 		PlayerHealth = PlayerPrefs.GetFloat("PlayerHealth", 100.0f);
 		previousState = PlayerState;
@@ -112,7 +112,6 @@ public class PlayerController : MonoBehaviour
 		
 		Screen.showCursor = false;
 		
-		Screen.lockCursor = true;
 	}
 	
 	
@@ -293,26 +292,50 @@ public class PlayerController : MonoBehaviour
 		if (PlayerState == 5)
 		{
 			
+			int moveCount = 0;
 			if (Input.GetKey(KeyCode.W))
 			{
-        		controller.SimpleMove(transform.forward * movespeed);
+				ismoving = true;
+				movedir += transform.TransformDirection(Vector3.forward);
+        		moveCount++;
 			}
 			if (Input.GetKey(KeyCode.A))
 			{
-	        	controller.SimpleMove((transform.right * -1) * movespeed);
+				ismoving = true;
+				movedir += transform.TransformDirection(Vector3.left);
+	        	moveCount++;
 			}
 			if (Input.GetKey(KeyCode.S))
 			{
-	        	controller.SimpleMove((transform.forward * -1) * movespeed);
+				ismoving = true;
+				movedir += transform.TransformDirection(Vector3.back);
+	        	moveCount++;
 			}
 			if (Input.GetKey(KeyCode.D))
 			{
-	        	controller.SimpleMove(transform.right * movespeed);
+				ismoving = true;
+				movedir += transform.TransformDirection(Vector3.right);
+	        	moveCount++;
 			}
+			
+			if(ismoving)
+			{
+				controller.SimpleMove(movedir * (movespeed * (1.0f - (moveCount * 0.2f))));
+			}
+			
+			if(controller.isGrounded == false && ismoving == false)
+			{
+				controller.SimpleMove(Vector3.down * (Time.deltaTime + gravity));
+			}
+			
+			
 			
 			float h = 2.0f * Input.GetAxis("Mouse X");
         	transform.Rotate(0, h, 0);
 			
+			movedir = new Vector3(0,0,0);
+			ismoving = false;
+			moveCount = 0;
 			
 		}
 		
@@ -331,12 +354,12 @@ public class PlayerController : MonoBehaviour
 			if(inventoryPrefab.camera.enabled)
 			{
 				inventoryPrefab.camera.enabled = false;
-				PlayerState = 0;
+				ChangePlayerState(5);
 			}
 			else
 			{
 				inventoryPrefab.camera.enabled = true;
-				PlayerState = 1;
+				ChangePlayerState(1);
 				inventoryPrefab.GetComponent<InventoryController>().UpdateInventoryList();
 			}
 		}
@@ -537,7 +560,7 @@ public class PlayerController : MonoBehaviour
 		{
 			CameraOffsetZ = 2.8f;
 			CameraOffsetX = 0.0f;
-			PlayerState = 5;
+			ChangePlayerState(5);
 			ToggleCameraFollow(true);
 			Destroy(other);
 		}
@@ -639,6 +662,14 @@ public class PlayerController : MonoBehaviour
 	public void ChangePlayerState(int StateModifier)
 	{
 		PlayerState = StateModifier;
+		if(StateModifier == 5)
+		{
+			Screen.lockCursor = true;
+		}
+		else
+		{
+			Screen.lockCursor = false;
+		}
 	}
 	
 	public void resetPlayerState()
