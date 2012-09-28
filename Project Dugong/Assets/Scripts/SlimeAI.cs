@@ -44,7 +44,7 @@ public class SlimeAI : MonoBehaviour {
 	void Start () 
 	{
 		Wander();
-		moveSpeed = 20f;
+		moveSpeed = 30f;
 		currentState = 0;
 		targetPlayer = GameObject.Find("You");
 		controller = GetComponent<Rigidbody>();
