@@ -25,6 +25,8 @@ public class SlimeAI : MonoBehaviour {
 	//Character Controller:
 	Rigidbody controller = new Rigidbody();
 	
+	
+	
 	//Movement related Variables
 	static float moveSpeed;
 	
@@ -44,7 +46,7 @@ public class SlimeAI : MonoBehaviour {
 	void Start () 
 	{
 		Wander();
-		moveSpeed = 30f;
+		moveSpeed = 0.5f;
 		currentState = 0;
 		targetPlayer = GameObject.Find("You");
 		controller = GetComponent<Rigidbody>();
@@ -146,15 +148,6 @@ public class SlimeAI : MonoBehaviour {
 		{
 	
 			
-			if(Vector3.Distance(transform.position,lastKnownLocation) < 1.0f)
-			{
-				moveSpeed = 0.3f;
-			}
-			else
-			{
-				moveSpeed = 0.85f;
-			}
-			
 			//LOOK AT THE PLAYER!
 			Quaternion targetRotation = Quaternion.LookRotation(targetPlayer.transform.position - transform.position);
 			targetRotation = new Quaternion(0,targetRotation.y,0,targetRotation.w);
@@ -230,6 +223,7 @@ public class SlimeAI : MonoBehaviour {
 		{
 		bouncedelay = 0;
 		controller.AddForce(new Vector3(0,30,0));
+		transform.FindChild("SlimeBlob").particleSystem.Play();
 		}
 		
 		
