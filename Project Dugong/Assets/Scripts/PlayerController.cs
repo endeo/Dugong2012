@@ -292,7 +292,11 @@ public class PlayerController : MonoBehaviour
 				inventoryPrefab.GetComponent<InventoryController>().UpdateInventoryList();
 			}
 		}
-		
+		//Target Switch
+		if(Input.GetKeyDown (KeyCode.R))
+		{
+			transform.GetComponentInChildren<NaviGuide>().switchTarget();
+		}
 		
 		
 		//Zoom Camera (BETA)
