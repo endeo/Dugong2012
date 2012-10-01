@@ -2,3 +2,4 @@ Make sure you know what you're doing before playing around with the GitHub, to e
 I still dont know what im doing. :)
 
 - Martin
+Also Nathan
