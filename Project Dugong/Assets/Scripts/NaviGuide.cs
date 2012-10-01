@@ -13,6 +13,7 @@ class InteractiveObject
 	public float distance;
 	public string targetName;
 	
+	
 	public InteractiveObject(int newType, Transform newTarget, string newName)
 	{
 		targetType = newType;
@@ -33,11 +34,14 @@ public class NaviGuide : MonoBehaviour {
 	List<InteractiveObject> targetList = new List<InteractiveObject>();
 	InteractiveObject currentTarget = new InteractiveObject();
 	int currentTargetID = 0;
+	bool targetMarkerExists;
+	public GameObject targetMarker;
+	
 	
 	// Use this for initialization
 	void Start () 
 	{
-		
+		targetMarkerExists = false;
 	}
 	
 	// Update is called once per frame
@@ -56,14 +60,37 @@ public class NaviGuide : MonoBehaviour {
 				}
 				
 			}
-			currentTarget = targetList[currentTargetID];
+			if(currentTargetID > targetList.Count)
+			{
+				switchTarget();
+			}
+			else
+			{
+				currentTarget = targetList[currentTargetID];
+			}
 			Debug.Log ("Current Target: " + currentTarget.targetName + " (ID: " + currentTargetID + "/" + (targetList.Count - 1) + ")");
+			
+			if(!targetMarkerExists)
+			{
+				targetMarker = Instantiate(Resources.Load ("Graphical/NaviMarker")) as GameObject;
+				targetMarkerExists = true;
+			}
+			else
+			{
+				targetMarker.transform.position = currentTarget.targetTransform.position;
+				targetMarker.transform.position += new Vector3(0.0f, 0.7f, 0.0f);
+			}
 		}
 		else
 		{
 			currentTargetID = 0; //Make sure that next time there is a target in the list, the list starts from the top.
 			currentTarget = null;
 			Debug.Log ("No Targets");
+			if(targetMarkerExists)
+			{
+				Destroy(targetMarker);
+				targetMarkerExists = false;
+			}
 		}
 		
 	}
@@ -72,9 +99,15 @@ public class NaviGuide : MonoBehaviour {
 	{
 		if(other.tag == "IOEnemy")
 		{
+			if(targetList.Exists(InteractiveObject => InteractiveObject.targetName == other.name))
+			{
+			}
+			else
+			{
 			InteractiveObject newEnemy = new InteractiveObject(0, other.transform, other.name);
 			targetList.Add(newEnemy);
 			Debug.Log ("Adding new Enemy to Navi-List - Type: " + newEnemy.targetType + " Name: " + newEnemy.targetName);
+			}
 		}
 		if(other.tag == "IONPC")
 		{
@@ -98,7 +131,7 @@ public class NaviGuide : MonoBehaviour {
 		}
 		else
 		{
-			if(currentTargetID == (targetList.Count - 1))
+			if((currentTargetID + 1) > targetList.Count - 1)
 			{
 				currentTargetID = 0;
 			}
