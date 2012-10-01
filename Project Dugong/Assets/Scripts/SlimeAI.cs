@@ -20,7 +20,7 @@ public class SlimeAI : MonoBehaviour {
 	
 	float goblinHealth = 100;
 	
-	public GameObject goblinRagdoll;
+	public GameObject babySlime;
 	
 	//Character Controller:
 	Rigidbody controller = new Rigidbody();
@@ -238,13 +238,18 @@ public class SlimeAI : MonoBehaviour {
 	{
 		if(other.transform.name == "SheepAxe(Clone)")
 		{
-			goblinHealth -= 100;
+			goblinHealth -= 50;
 		}
 	}
 	
 	void killThis() //This kills the Goblin.
 	{
-		Instantiate (goblinRagdoll, transform.position, transform.rotation);
+		if (this.transform.name == "Slime")
+		{
+		Instantiate (babySlime, transform.position, transform.rotation);
+		Instantiate (babySlime, transform.position, transform.rotation);
+		Instantiate (babySlime, transform.position, transform.rotation);
+		}
 		Destroy(gameObject);
 	}
 	
