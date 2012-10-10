@@ -10,6 +10,7 @@ public class PlayerFacer : MonoBehaviour {
 	void Start()
 	{
 		TargetPlayer = GameObject.Find("YouObject");
+		Debug.Log ("I just spawned!");
 	}
 	
 	void Update () 
