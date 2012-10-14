@@ -222,6 +222,7 @@ public class SlimeAI : MonoBehaviour {
 		if (bouncedelay >= 50)
 		{
 		bouncedelay = 0;
+		audio.Play();
 		controller.AddForce(new Vector3(0,30,0));
 		transform.FindChild("SlimeBlob").particleSystem.Play();
 		}
@@ -229,6 +230,7 @@ public class SlimeAI : MonoBehaviour {
 		
 		if(goblinHealth < 0.1)
 		{
+			
 			killThis();
 		}
 		
@@ -238,12 +240,14 @@ public class SlimeAI : MonoBehaviour {
 	{
 		if(other.transform.name == "SheepAxe(Clone)")
 		{
+			transform.FindChild ("DeathSound").audio.Play ();
 			goblinHealth -= 50;
 		}
 	}
 	
 	void killThis() //This kills the Goblin.
 	{
+		
 		if (this.transform.name == "Slime")
 		{
 		Instantiate (babySlime, transform.position, transform.rotation);
