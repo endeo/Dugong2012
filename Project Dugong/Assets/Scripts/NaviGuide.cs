@@ -35,7 +35,7 @@ public class NaviGuide : MonoBehaviour {
 	InteractiveObject currentTarget = new InteractiveObject();
 	int currentTargetID = 0;
 	bool targetMarkerExists;
-	public GameObject targetMarker;
+	GameObject targetMarker;
 	
 	
 	// Use this for initialization
@@ -48,6 +48,12 @@ public class NaviGuide : MonoBehaviour {
 	void Update () 
 	{
 		//Update the distance of each item in the list
+		if(targetMarkerExists && currentTarget == null)
+		{
+			switchTarget();
+			Destroy(targetMarker);
+			targetMarkerExists = false;
+		}
 		if(targetList.Count > 0)
 		{
 			foreach(InteractiveObject iteratedTarget in targetList)
@@ -68,7 +74,7 @@ public class NaviGuide : MonoBehaviour {
 			{
 				currentTarget = targetList[currentTargetID];
 			}
-			Debug.Log ("Current Target: " + currentTarget.targetName + " (ID: " + currentTargetID + "/" + (targetList.Count - 1) + ")");
+			//Debug.Log ("Current Target: " + currentTarget.targetName + " (ID: " + currentTargetID + "/" + (targetList.Count - 1) + ")");
 			
 			if(!targetMarkerExists)
 			{
@@ -85,7 +91,7 @@ public class NaviGuide : MonoBehaviour {
 		{
 			currentTargetID = 0; //Make sure that next time there is a target in the list, the list starts from the top.
 			currentTarget = null;
-			Debug.Log ("No Targets");
+			//Debug.Log ("No Targets");
 			if(targetMarkerExists)
 			{
 				Destroy(targetMarker);
@@ -139,6 +145,20 @@ public class NaviGuide : MonoBehaviour {
 			{
 				currentTargetID++;
 			}
+		}
+	}
+	
+	public void killTarget(string targetName)
+	{
+		foreach(InteractiveObject iteratedTarget in targetList)
+		{
+			if(iteratedTarget.targetName == targetName)
+			{
+				Debug.Log ("Removing " + targetName + " from list.");
+				switchTarget();
+				targetList.Remove(iteratedTarget);
+			}
+				
 		}
 	}
 }

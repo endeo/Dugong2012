@@ -48,7 +48,7 @@ public class SlimeAI : MonoBehaviour {
 		Wander();
 		moveSpeed = 0.5f;
 		currentState = 0;
-		targetPlayer = GameObject.Find("You");
+		targetPlayer = GameObject.Find("YouObject");
 		controller = GetComponent<Rigidbody>();
 	}
 	
@@ -251,6 +251,7 @@ public class SlimeAI : MonoBehaviour {
 		Instantiate (babySlime, transform.position, transform.rotation);
 		}
 		Destroy(gameObject);
+		targetPlayer.GetComponentInChildren<NaviGuide>().killTarget(transform.name);
 	}
 	
 	
